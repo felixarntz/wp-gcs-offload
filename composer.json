@@ -1,0 +1,74 @@
+{
+  "name": "felixarntz/wp-gcs-offload",
+  "description": "This plugin allows offloading your media library to Google Cloud Storage, including easy management and migration tools.",
+  "version": "0.5.0",
+  "license": "GPL-3.0",
+  "type": "wordpress-plugin",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "google cloud storage",
+    "offload",
+    "media library",
+    "cdn"
+  ],
+  "homepage": "https://wordpress.org/plugins/wp-gcs-offload/",
+  "authors": [
+    {
+      "name": "Felix Arntz",
+      "email": "felix-arntz@leaves-and-love.net",
+      "homepage": "http://leaves-and-love.net",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "felix-arntz@leaves-and-love.net",
+    "issues": "https://github.com/felixarntz/wp-gcs-offload/issues"
+  },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "A5hleyRich/wp-background-processing",
+        "version": "dev-master",
+        "source": {
+          "url": "git://github.com/A5hleyRich/wp-background-processing.git",
+          "type": "git",
+          "reference": "master"
+        },
+        "dist": {
+          "url": "https://github.com/A5hleyRich/wp-background-processing/archive/master.zip",
+          "type": "zip"
+        },
+        "autoload": {
+          "classmap": [
+            "classes/"
+          ]
+        }
+      }
+    }
+  ],
+  "config": {
+    "preferred-install": "dist"
+  },
+  "autoload": {
+    "psr-4": {
+      "WPGCSOffload\\": "inc/WPGCSOffload/"
+    }
+  },
+  "require": {
+    "composer/installers": "~1.0",
+    "felixarntz/options-definitely": "0.6.2",
+    "felixarntz/leavesandlove-wp-plugin-util": "2.0.1",
+    "A5hleyRich/wp-background-processing": "dev-master",
+    "google/apiclient": "^2.0.0@RC"
+  },
+  "require-dev": {
+    "codeclimate/php-test-reporter": "dev-master"
+  },
+  "extra": {
+    "installer-paths": {
+      "vendor/felixarntz/{$name}/": ["felixarntz/options-definitely"]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+languages:
+   PHP: true
+exclude_paths:
+- "vendor/*"
+- "assets/vendor/*"
+- "node_modules/*"
+- "tests/*"

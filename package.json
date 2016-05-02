@@ -1,0 +1,44 @@
+{
+  "name": "wp-gcs-offload",
+  "version": "0.5.0",
+  "description": "This plugin allows offloading your media library to Google Cloud Storage, including easy management and migration tools.",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "google cloud storage",
+    "offload",
+    "media library",
+    "cdn"
+  ],
+  "author": {
+    "name": "Felix Arntz",
+    "email": "felix-arntz@leaves-and-love.net",
+    "url": "http://leaves-and-love.net"
+  },
+  "homepage": "https://wordpress.org/plugins/wp-gcs-offload/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/felixarntz/wp-gcs-offload.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/felixarntz/wp-gcs-offload/issues"
+  },
+  "license": {
+    "type": "GPL-3.0",
+    "name": "GNU General Public License v3",
+    "url": "http://www.gnu.org/licenses/gpl-3.0.html"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-jshint": "~0.11.0",
+    "grunt-contrib-uglify": "~0.7.0",
+    "grunt-contrib-cssmin": "~0.11.0",
+    "grunt-banner": "~0.3.1",
+    "grunt-text-replace": "~0.4.0",
+    "bower": "~1.3.12"
+  }
+}
