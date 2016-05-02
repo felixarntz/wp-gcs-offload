@@ -4,8 +4,8 @@
 [![Latest Stable Version](https://poser.pugx.org/felixarntz/wp-gcs-offload/version)](https://packagist.org/packages/felixarntz/wp-gcs-offload)
 [![License](https://poser.pugx.org/felixarntz/wp-gcs-offload/license)](https://packagist.org/packages/felixarntz/wp-gcs-offload)
 
-Options Definitely
-==================
+WP GCS Offload
+==============
 
 This plugin allows offloading your media library to Google Cloud Storage, including easy management and migration tools.
 
