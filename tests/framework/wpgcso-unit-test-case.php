@@ -6,7 +6,7 @@ class WPGCSO_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	protected function create_attachment( $img_name, $mime_type ) {
-		return self::factory()->attachment->create_object( $img_name, 0, array(
+		return $this->factory->attachment->create_object( $img_name, 0, array(
 			'post_mime_type' => $mime_type,
 			'post_type' => 'attachment'
 		) );
