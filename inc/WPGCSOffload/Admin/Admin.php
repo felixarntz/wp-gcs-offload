@@ -59,7 +59,7 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Admin' ) ) {
 				case self::CAP_MANAGE:
 				case self::CAP_SETUP:
 					if ( ! self::is_network_active() ) {
-						$caps[] = 'manage_options';
+						return array( 'manage_options' );
 					}
 					break;
 			}

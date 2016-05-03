@@ -66,6 +66,10 @@ if ( ! class_exists( 'WPGCSOffload\App' ) ) {
 		 * @return array the modified links
 		 */
 		public static function filter_plugin_links( $links = array() ) {
+			if ( ! current_user_can( Admin::CAP_SETUP ) ) {
+				return $links;
+			}
+
 			$custom_links = array(
 				'<a href="' . Admin::get_settings_url() . '">' . __( 'Settings', 'wp-gcs-offload' ) . '</a>',
 			);
@@ -106,7 +110,9 @@ if ( ! class_exists( 'WPGCSOffload\App' ) ) {
 			</p>
 			<p>
 				<?php _e( 'This plugin can be used to offload your media library to Google Cloud Storage.', 'wp-gcs-offload' ); ?>
-				<?php printf( __( 'Go to the <a href="%s">Settings Page</a> to get started!', 'wp-gcs-offload' ), Admin::get_settings_url() ); ?>
+				<?php if ( current_user_can( Admin::CAP_SETUP ) ) :
+					printf( __( 'Go to the <a href="%s">Settings Page</a> to get started!', 'wp-gcs-offload' ), Admin::get_settings_url() );
+				endif; ?>
 			</p>
 			<?php
 		}

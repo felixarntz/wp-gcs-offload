@@ -35,6 +35,12 @@ if ( version_compare( phpversion(), '5.3.0' ) >= 0 && ! class_exists( 'WPGCSOffl
 	}
 }
 
+if ( file_exists( dirname( __FILE__ ) . '/wp-gcs-offload/vendor/felixarntz/options-definitely/options-definitely.php' ) ) {
+	require_once dirname( __FILE__ ) . '/wp-gcs-offload/vendor/felixarntz/options-definitely/options-definitely.php';
+} elseif ( file_exists( dirname( __FILE__ ) . '/vendor/felixarntz/options-definitely/options-definitely.php' ) ) {
+	require_once dirname( __FILE__ ) . '/vendor/felixarntz/options-definitely/options-definitely.php';
+}
+
 LaL_WP_Plugin_Loader::load_plugin( array(
 	'slug'					=> 'wp-gcs-offload',
 	'name'					=> 'WP GCS Offload',
