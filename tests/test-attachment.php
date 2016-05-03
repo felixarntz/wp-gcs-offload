@@ -24,7 +24,7 @@ class WPGCSO_Test_Attachment extends WPGCSO_UnitTestCase {
 	public function test_is_cloud_storage_file() {
 		$img_name = 'my-image.jpg';
 		$bucket_name = 'my-bucket';
-		$dir_name = 'www.example.com';
+		$dir_name = WP_TESTS_DOMAIN;
 
 		$attachment = $this->create_and_get_attachment( $img_name, 'image/jpeg' );
 		$this->assertFalse( $attachment->is_cloud_storage_file() );
@@ -34,13 +34,11 @@ class WPGCSO_Test_Attachment extends WPGCSO_UnitTestCase {
 	}
 
 	public function test_get_cloud_storage_url() {
-		$img_name = 'my-image.jpg';
+		$img_name = $this->get_yearmonth_dir() . '/my-image.jpg';
 		$bucket_name = 'my-bucket';
-		$dir_name = 'www.example.com';
+		$dir_name = WP_TESTS_DOMAIN;
 
-		$yearmonth_dir = $this->get_yearmonth_dir();
-
-		$expected = 'https://storage.googleapis.com/' . $bucket_name . '/' . $dir_name . '/' . $yearmonth_dir . '/' . $img_name;
+		$expected = 'https://storage.googleapis.com/' . $bucket_name . '/' . $dir_name . '/' . $img_name;
 
 		$attachment = $this->create_and_get_attachment( $img_name, 'image/jpeg' );
 		$this->upload_attachment_to_gcs( $attachment->get_id(), $bucket_name, $dir_name );
@@ -48,13 +46,11 @@ class WPGCSO_Test_Attachment extends WPGCSO_UnitTestCase {
 	}
 
 	public function test_get_cloud_storage_image_downsize() {
-		$img_name = 'my-image.jpg';
+		$img_name = $this->get_yearmonth_dir() . '/my-image.jpg';
 		$bucket_name = 'my-bucket';
-		$dir_name = 'www.example.com';
+		$dir_name = WP_TESTS_DOMAIN;
 
-		$yearmonth_dir = $this->get_yearmonth_dir();
-
-		$expected = 'https://storage.googleapis.com/' . $bucket_name . '/' . $dir_name . '/' . $yearmonth_dir . '/' . $img_name;
+		$expected = 'https://storage.googleapis.com/' . $bucket_name . '/' . $dir_name . '/' . $img_name;
 
 		$attachment = $this->create_and_get_attachment( $img_name, 'image/jpeg' );
 		$this->upload_attachment_to_gcs( $attachment->get_id(), $bucket_name, $dir_name );
