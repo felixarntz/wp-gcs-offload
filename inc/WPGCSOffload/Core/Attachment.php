@@ -40,6 +40,10 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			$this->id = $id;
 		}
 
+		public function get_id() {
+			return $this->id;
+		}
+
 		public function is_local_file() {
 			return ! get_post_meta( $this->id, '_wpgcso_remote_only', true );
 		}
@@ -74,7 +78,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			}
 
 			$gcs_sizes = get_post_meta( $this->id, '_wpgcso_image_sizes' );
-			if ( ! in_array( $size, $gcs_sizes, true ) ) {
+			if ( ! is_array( $gcs_sizes ) || ! in_array( $size, $gcs_sizes, true ) ) {
 				return false;
 			}
 

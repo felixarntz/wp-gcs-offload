@@ -32,8 +32,6 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Menu' ) ) {
 
 		private $settings = null;
 
-		private $cap = '';
-
 		private function __construct() {
 			// empty
 		}
