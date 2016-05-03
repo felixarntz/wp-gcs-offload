@@ -7,8 +7,8 @@
 
 namespace WPGCSOffload;
 
-use WPGCSOffload\Core\Core as Core;
-use WPGCSOffload\Admin\Admin as Admin;
+use WPGCSOffload\Core\Core;
+use WPGCSOffload\Admin\Admin;
 use LaL_WP_Plugin as Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {

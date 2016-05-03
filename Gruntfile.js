@@ -26,9 +26,17 @@ module.exports = function(grunt) {
 						' */',
 
 		clean: {
-			admin: [
-				'assets/admin.min.js',
-				'assets/admin.min.css'
+			media_library: [
+				'assets/media-library.min.js',
+				'assets/media-library.min.css'
+			],
+			attachment_edit: [
+				'assets/attachment-edit.min.js',
+				'assets/attachment-edit.min.css'
+			],
+			manage_gcs: [
+				'assets/manage-gcs.min.js',
+				'assets/manage-gcs.min.css'
 			]
 		},
 
@@ -36,9 +44,19 @@ module.exports = function(grunt) {
 			options: {
 				jshintrc: 'assets/.jshintrc'
 			},
-			admin: {
+			media_library: {
 				src: [
-					'assets/admin.js'
+					'assets/media-library.js'
+				]
+			},
+			attachment_edit: {
+				src: [
+					'assets/attachment-edit.js'
+				]
+			},
+			manage_gcs: {
+				src: [
+					'assets/manage-gcs.js'
 				]
 			}
 		},
@@ -48,9 +66,17 @@ module.exports = function(grunt) {
 				preserveComments: 'some',
 				report: 'min'
 			},
-			admin: {
-				src: 'assets/admin.js',
-				dest: 'assets/admin.min.js'
+			media_library: {
+				src: 'assets/media-library.js',
+				dest: 'assets/media-library.min.js'
+			},
+			attachment_edit: {
+				src: 'assets/attachment-edit.js',
+				dest: 'assets/attachment-edit.min.js'
+			},
+			manage_gcs: {
+				src: 'assets/manage-gcs.js',
+				dest: 'assets/manage-gcs.min.js'
 			}
 		},
 
@@ -60,9 +86,19 @@ module.exports = function(grunt) {
 				keepSpecialComments: '*',
 				noAdvanced: true
 			},
-			admin: {
+			media_library: {
 				files: {
-					'assets/admin.min.css': 'assets/admin.css'
+					'assets/media-library.min.css': 'assets/media-library.css'
+				}
+			},
+			attachment_edit: {
+				files: {
+					'assets/attachment-edit.min.css': 'assets/attachment-edit.css'
+				}
+			},
+			manage_gcs: {
+				files: {
+					'assets/manage-gcs.min.css': 'assets/manage-gcs.css'
 				}
 			}
 		},
@@ -72,10 +108,22 @@ module.exports = function(grunt) {
 				position: 'top',
 				banner: '<%= banner %>'
 			},
-			admin: {
+			media_library: {
 				src: [
-					'assets/admin.min.js',
-					'assets/admin.min.css'
+					'assets/media-library.min.js',
+					'assets/media-library.min.css'
+				]
+			},
+			attachment_edit: {
+				src: [
+					'assets/attachment-edit.min.js',
+					'assets/attachment-edit.min.css'
+				]
+			},
+			manage_gcs: {
+				src: [
+					'assets/manage-gcs.min.js',
+					'assets/manage-gcs.min.css'
 				]
 			}
 		},
@@ -113,11 +161,25 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-banner');
 	grunt.loadNpmTasks('grunt-text-replace');
 
-	grunt.registerTask('admin', [
-		'clean:admin',
-		'jshint:admin',
-		'uglify:admin',
-		'cssmin:admin'
+	grunt.registerTask('media_library', [
+		'clean:media_library',
+		'jshint:media_library',
+		'uglify:media_library',
+		'cssmin:media_library'
+	]);
+
+	grunt.registerTask('attachment_edit', [
+		'clean:attachment_edit',
+		'jshint:attachment_edit',
+		'uglify:attachment_edit',
+		'cssmin:attachment_edit'
+	]);
+
+	grunt.registerTask('manage_gcs', [
+		'clean:manage_gcs',
+		'jshint:manage_gcs',
+		'uglify:manage_gcs',
+		'cssmin:manage_gcs'
 	]);
 
 	grunt.registerTask('plugin', [
@@ -126,11 +188,15 @@ module.exports = function(grunt) {
 	]);
 
 	grunt.registerTask('default', [
-		'admin'
+		'media_library',
+		'attachment_edit',
+		'manage_gcs'
 	]);
 
 	grunt.registerTask('build', [
-		'admin',
+		'media_library',
+		'attachment_edit',
+		'manage_gcs',
 		'plugin'
 	]);
 };

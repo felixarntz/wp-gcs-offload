@@ -46,11 +46,15 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Admin' ) ) {
 
 			$manager = Manager::instance();
 			$settings = Settings::instance();
+			$attachment_edit = AttachmentEdit::instance();
 
 			$menu->set_manager( $manager );
 			$menu->set_settings( $settings );
 
 			add_action( 'wpod', array( $menu, 'add_components' ) );
+			add_action( 'admin_enqueue_scripts', array( $attachment_edit, 'enqueue_scripts' ), 10, 1 );
+			add_action( 'attachment_submitbox_misc_actions', array( $attachment_edit, 'attachment_submitbox_misc_actions' ), 100, 0 );
+
 			add_filter( 'map_meta_cap', array( $this, 'map_meta_cap' ), 10, 4 );
 		}
 

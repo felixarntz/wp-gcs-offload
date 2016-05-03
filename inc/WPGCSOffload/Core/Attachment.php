@@ -20,7 +20,15 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 	class Attachment {
 		private static $instances = array();
 
-		public static function get( $id ) {
+		public static function get( $id = null ) {
+			if ( ! $id ) {
+				$post = get_post();
+				if ( ! $post ) {
+					return null;
+				}
+				$id = $post->ID;
+			}
+
 			$id = absint( $id );
 
 			if ( ! isset( self::$instances[ $id ] ) ) {
@@ -52,6 +60,22 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			return (bool) get_post_meta( $this->id, '_wpgcso_bucket_name', true ) && (bool) get_post_meta( $this->id, '_wpgcso_dir_name', true );
 		}
 
+		public function get_cloud_storage_bucket_name() {
+			return get_post_meta( $this->id, '_wpgcso_bucket_name', true );
+		}
+
+		public function get_cloud_storage_dir_name() {
+			return get_post_meta( $this->id, '_wpgcso_dir_name', true );
+		}
+
+		public function get_cloud_storage_image_sizes() {
+			$gcs_sizes = get_post_meta( $this->id, '_wpgcso_image_sizes' );
+			if ( ! $gcs_sizes ) {
+				return array();
+			}
+			return $gcs_sizes;
+		}
+
 		public function get_cloud_storage_url() {
 			$bucket_name = get_post_meta( $this->id, '_wpgcso_bucket_name', true );
 			if ( ! $bucket_name ) {
@@ -77,8 +101,8 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				return false;
 			}
 
-			$gcs_sizes = get_post_meta( $this->id, '_wpgcso_image_sizes' );
-			if ( ! is_array( $gcs_sizes ) || ! in_array( $size, $gcs_sizes, true ) ) {
+			$gcs_sizes = $this->get_cloud_storage_image_sizes();
+			if ( ! in_array( $size, $gcs_sizes, true ) ) {
 				return false;
 			}
 
