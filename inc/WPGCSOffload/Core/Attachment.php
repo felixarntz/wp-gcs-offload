@@ -96,7 +96,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				//TODO: can we handle this?
 			}
 
-			if ( ! $width && ! $height && isset( $meta['width'] ) && isset( $meta['height'] ) ) {
+			if ( ! $width && ! $height && $meta && isset( $meta['width'] ) && isset( $meta['height'] ) ) {
 				$width = $meta['width'];
 				$height = $meta['height'];
 			}

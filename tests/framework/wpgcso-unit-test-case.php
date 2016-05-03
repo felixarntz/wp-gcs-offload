@@ -23,7 +23,7 @@ class WPGCSO_UnitTestCase extends WP_UnitTestCase {
 		$metadata = wp_get_attachment_metadata( $attachment_id );
 
 		$did_full = false;
-		if ( $metadata['sizes'] ) {
+		if ( $metadata && $metadata['sizes'] ) {
 			foreach ( $metadata['sizes'] as $size => $data ) {
 				if ( 'full' === $size ) {
 					$did_full = true;
