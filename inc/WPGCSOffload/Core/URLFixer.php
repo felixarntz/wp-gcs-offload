@@ -36,7 +36,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\URLFixer' ) ) {
 
 		public function image_downsize( $false, $id, $size ) {
 			$attachment = Attachment::get( $id );
-			if ( ! $attachment->is_cloud_storage_file() ) {
+			if ( ! $this->url_fixes_needed( $attachment ) ) {
 				return $false;
 			}
 
@@ -50,7 +50,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\URLFixer' ) ) {
 
 		public function wp_get_attachment_url( $url, $id ) {
 			$attachment = Attachment::get( $id );
-			if ( ! $attachment->is_cloud_storage_file() ) {
+			if ( ! $this->url_fixes_needed( $attachment ) ) {
 				return $url;
 			}
 
@@ -94,6 +94,18 @@ if ( ! class_exists( 'WPGCSOffload\Core\URLFixer' ) ) {
 			}
 
 			return $id;
+		}
+
+		private function url_fixes_needed( $attachment ) {
+			if ( ! $attachment->is_cloud_storage_file() ) {
+				return false;
+			}
+
+			if ( 'prefer_local' === Settings::instance()->get_setting( 'gcs_mode' ) && $attachment->is_local_file() ) {
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

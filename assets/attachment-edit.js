@@ -1,4 +1,4 @@
-( function( wp, $ ) {
+( function( wp, $, data ) {
 	$( document ).on( 'click', '#wp-gcs-offload-sync-attachment', function( e ) {
 		e.preventDefault();
 
@@ -12,6 +12,10 @@
 		function create_sync_notice( message, type ) {
 			var $notice_section = $( '<div id="wp-gcs-offload-sync-notice-wrap" class="misc-pub-section" />' );
 			var $notice = $( '<div id="wp-gcs-offload-sync-notice" class="notice notice-' + type + '" />' );
+
+			if ( 'error' === type ) {
+				message = '<strong>' + data.error_prefix + '</strong> ' + message;
+			}
 
 			$notice.html( '<p>' + message + '</p>' );
 			$notice_section.append( $notice );
@@ -29,11 +33,12 @@
 		}
 
 		wp.ajax.post( 'wpgcso_sync_attachment', {
+			nonce: data.sync_attachment_nonce,
 			attachment_id: attachment_id
 		}).done( function( response ) {
 			var $wrap = $( '#wp-gcs-offload-data' );
 
-			$( '#wp-gcs-offload-data' ).html( response.html );
+			$( '#wp-gcs-offload-data' ).replaceWith( response.html );
 
 			create_sync_notice( response.message, 'success' );
 		}).fail( function( message ) {
@@ -42,4 +47,4 @@
 			create_sync_notice( message, 'error' );
 		});
 	});
-}( wp, jQuery ) );
+}( wp, jQuery, _wpGCSOffloadAttachmentEdit ) );

@@ -12,7 +12,8 @@
     "jQuery": false,
     "console": false,
     "wp": false,
-    "wpGCSOffload": false,
+    "_wpGCSOffloadManageGCS": false,
+    "_wpGCSOffloadAttachmentEdit": false,
     "ajaxurl": false
   }
 }

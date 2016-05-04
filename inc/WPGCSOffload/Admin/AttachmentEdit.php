@@ -10,6 +10,8 @@ namespace WPGCSOffload\Admin;
 use WPGCSOffload\App;
 use WPGCSOffload\Core\Attachment;
 use WPGCSOffload\Core\Client;
+use WPGCSOffload\Core\AjaxHandler;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -33,7 +35,7 @@ if ( ! class_exists( 'WPGCSOffload\Admin\AttachmentEdit' ) ) {
 		}
 
 		private function __construct() {
-			// empty
+			AjaxHandler::instance()->register_action( 'sync_attachment', array( $this, 'ajax_sync_attachment' ) );
 		}
 
 		public function enqueue_scripts( $hook ) {
@@ -49,6 +51,11 @@ if ( ! class_exists( 'WPGCSOffload\Admin\AttachmentEdit' ) ) {
 
 			wp_enqueue_script( 'wp-gcs-offload-attachment-edit', App::get_url( 'assets/attachment-edit' . $min . '.js' ), array( 'jquery', 'wp-util'), App::get_info( 'version' ), true );
 			wp_enqueue_style( 'wp-gcs-offload-attachment-edit', App::get_url( 'assets/attachment-edit' . $min . '.css' ), array(), App::get_info( 'version' ) );
+
+			wp_localize_script( 'wp-gcs-offload-attachment-edit', '_wpGCSOffloadAttachmentEdit', array(
+				'sync_attachment_nonce'	=> AjaxHandler::instance()->get_action_nonce( 'sync_attachment' ),
+				'error_prefix'			=> __( 'Error:', 'wp-gcs-offload' ),
+			) );
 		}
 
 		public function attachment_submitbox_misc_actions( $id = null ) {
@@ -86,6 +93,41 @@ if ( ! class_exists( 'WPGCSOffload\Admin\AttachmentEdit' ) ) {
 				</div>
 			</div>
 			<?php
+		}
+
+		public function ajax_sync_attachment( $data ) {
+			return new WP_Error( 'TODO', __( 'This method is not yet implemented.', 'wp-gcs-offload' ) );
+
+			if ( ! isset( $data['attachment_id'] ) ) {
+				return new WP_Error( 'attachment_id_missing', __( 'Missing attachment ID.', 'wp-gcs-offload' ) );
+			}
+
+			$attachment_id = absint( $data['attachment_id'] );
+
+			$attachment = Attachment::get( $attachment_id );
+
+			if ( ! $attachment ) {
+				return new WP_Error( 'attachment_id_invalid', __( 'Invalid attachment ID.', 'wp-gcs-offload' ) );
+			}
+
+			$gcs_data = $attachment->upload_to_google_cloud_storage();
+			if ( is_wp_error( $gcs_data ) ) {
+				return $gcs_data;
+			}
+
+			if ( Settings::instance()->get_setting( 'remote_only' ) ) {
+				$attachment->delete_local_file();
+			}
+
+			ob_start();
+			$this->attachment_submitbox_misc_actions( $attachment_id );
+			$html = ob_get_clean();
+
+			return array(
+				'gcs_data'	=> $gcs_data,
+				'html'		=> $html,
+				'message'	=> __( 'Attachment successfully uploaded to Google Cloud Storage.', 'wp-gcs-offload' ),
+			);
 		}
 	}
 }

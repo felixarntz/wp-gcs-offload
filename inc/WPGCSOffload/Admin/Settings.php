@@ -33,8 +33,9 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Settings' ) ) {
 		}
 
 		public function get_setting( $name ) {
-			if ( Admin::is_network_active() ) {
+			if ( Admin::is_network_active() && ( 'authentication_key' === $name || 'bucket_name' === $name ) ) {
 				$constant_name = $this->get_setting_constant_name( $name );
+
 				if ( defined( $constant_name ) ) {
 					return constant( $constant_name );
 				}
@@ -43,6 +44,22 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Settings' ) ) {
 			}
 
 			$settings = get_option( 'wp-gcs-offload-settings', array() );
+
+			switch ( $name ) {
+				case 'gcs_mode':
+					if ( isset( $settings[ $name ] ) && ! empty( $settings[ $name ] ) ) {
+						return $settings[ $name ];
+					}
+					return 'prefer_local';
+				case 'sync_addition':
+				case 'sync_deletion':
+				case 'remote_only':
+					if ( isset( $settings[ $name ] ) ) {
+						return (bool) $settings[ $name ];
+					}
+					return false;
+			}
+
 			if ( isset( $settings[ $name ] ) ) {
 				return $settings[ $name ];
 			}
@@ -95,13 +112,30 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Settings' ) ) {
 			return array(
 				'gcs_mode'					=> array(
 					'title'						=> __( 'Plugin Mode', 'wp-gcs-offload' ),
-					'description'				=> __( 'Specify whether your site should prefer local or remote attachment files and whether files should remain local on the server. Note that this will not instantly change anything - it will only specify how the plugin is going to work in the future.', 'wp-gcs-offload' ),
+					'description'				=> __( 'Specify whether your site should prefer local or remote attachment files.', 'wp-gcs-offload' ),
 					'type'						=> 'select',
 					'options'					=> array(
 						'prefer_local'				=> __( 'Prefer local files', 'wp-gcs-offload' ),
 						'prefer_remote'				=> __( 'Prefer Google Cloud Storage files', 'wp-gcs-offload' ),
-						'delete_local'				=> __( 'Delete local files and only load from Google Cloud Storage', 'wp-gcs-offload' ),
 					),
+				),
+				'sync_addition'				=> array(
+					'title'						=> __( 'Addition Mode', 'wp-gcs-offload' ),
+					'description'				=> __( 'When this is enabled, all new attachments will automatically be uploaded to Google Cloud Storage.', 'wp-gcs-offload' ),
+					'type'						=> 'checkbox',
+					'label'						=> __( 'Upload all new attachments to Google Cloud Storage?', 'wp-gcs-offload' ),
+				),
+				'sync_deletion'				=> array(
+					'title'						=> __( 'Deletion Mode', 'wp-gcs-offload' ),
+					'description'				=> __( 'When this is enabled, deleting an attachment will cause its files on Google Cloud Storage to be deleted as well.', 'wp-gcs-offload' ),
+					'type'						=> 'checkbox',
+					'label'						=> __( 'Delete Google Cloud Storage files on attachment deletion?', 'wp-gcs-offload' ),
+				),
+				'remote_only'				=> array(
+					'title'						=> __( 'Remote Only Mode', 'wp-gcs-offload' ),
+					'description'				=> __( 'When this is enabled, local files will be deleted once they have been uploaded to Google Cloud Storage.', 'wp-gcs-offload' ),
+					'type'						=> 'checkbox',
+					'label'						=> __( 'Automatically delete local files after Google Cloud Storage upload?', 'wp-gcs-offload' ),
 				),
 			);
 		}

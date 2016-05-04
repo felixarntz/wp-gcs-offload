@@ -37,6 +37,8 @@ if ( ! class_exists( 'WPGCSOffload\Core\Core' ) ) {
 		public function run() {
 			$this->setup_client();
 			$this->setup_url_fixer();
+			$this->setup_sync_assistant();
+			$this->setup_ajax_handler();
 		}
 
 		public function setup_client() {
@@ -48,17 +50,23 @@ if ( ! class_exists( 'WPGCSOffload\Core\Core' ) ) {
 		}
 
 		public function setup_url_fixer() {
-			$gcs_mode = Settings::instance()->get_setting( 'gcs_mode' );
-
-			if ( ! $gcs_mode || 'prefer_local' === $gcs_mode ) {
-				return;
-			}
-
 			$url_fixer = URLFixer::instance();
 
 			add_filter( 'image_downsize', array( $url_fixer, 'image_downsize' ), 10, 3 );
 			add_filter( 'wp_get_attachment_url', array( $url_fixer, 'wp_get_attachment_url' ), 10, 2 );
 			add_filter( 'attachment_url_to_postid', array( $url_fixer, 'attachment_url_to_postid' ), 10, 2 );
+		}
+
+		public function setup_sync_assistant() {
+			$sync_assistant = SyncAssistant::instance();
+
+			add_filter( 'wp_update_attachment_metadata', array( $sync_assistant, 'wp_update_attachment_metadata' ), 10, 2 );
+		}
+
+		public function setup_ajax_handler() {
+			$ajax_handler = AjaxHandler::instance();
+
+			add_action( 'admin_init', array( $ajax_handler, 'add_actions' ) );
 		}
 	}
 }

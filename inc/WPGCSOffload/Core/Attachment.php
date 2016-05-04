@@ -7,6 +7,8 @@
 
 namespace WPGCSOffload\Core;
 
+use WP_Error;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
@@ -128,6 +130,42 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			list( $width, $height ) = image_constrain_size_for_editor( $width, $height, $size );
 
 			return array( $gcs_url, $width, $height, $is_intermediate );
+		}
+
+		public function upload_to_google_cloud_storage( $metadata = false ) {
+			if ( ! Client::instance()->is_configured() ) {
+				return new WP_Error( 'client_not_configured', __( 'The Google Cloud Storage client is not configured properly.', 'wp-gcs-offload' ) );
+			}
+
+			if ( ! $metadata ) {
+				$metadata = wp_get_attachment_metadata( $this->id );
+			}
+		}
+
+		public function delete_from_google_cloud_storage( $metadata = false ) {
+			if ( ! Client::instance()->is_configured() ) {
+				return new WP_Error( 'client_not_configured', __( 'The Google Cloud Storage client is not configured properly.', 'wp-gcs-offload' ) );
+			}
+
+			if ( ! $metadata ) {
+				$metadata = wp_get_attachment_metadata( $this->id );
+			}
+		}
+
+		public function get_from_google_cloud_storage( $metadata = false ) {
+			if ( ! Client::instance()->is_configured() ) {
+				return new WP_Error( 'client_not_configured', __( 'The Google Cloud Storage client is not configured properly.', 'wp-gcs-offload' ) );
+			}
+
+			if ( ! $metadata ) {
+				$metadata = wp_get_attachment_metadata( $this->id );
+			}
+		}
+
+		public function delete_local_file( $metadata = false ) {
+			if ( ! $metadata ) {
+				$metadata = wp_get_attachment_metadata( $this->id );
+			}
 		}
 	}
 }
