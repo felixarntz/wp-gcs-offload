@@ -9,7 +9,9 @@ namespace WPGCSOffload;
 
 use WPGCSOffload\Core\Core;
 use WPGCSOffload\Admin\Admin;
+use WPGCSOffload\Core\BackgroundSync;
 use LaL_WP_Plugin as Plugin;
+use WP_Background_Process_Logging;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -30,6 +32,8 @@ if ( ! class_exists( 'WPGCSOffload\App' ) ) {
 		 * @var array Holds the plugin data.
 		 */
 		protected static $_args = array();
+
+		protected static $background_sync = null;
 
 		/**
 		 * Class constructor.
@@ -53,8 +57,35 @@ if ( ! class_exists( 'WPGCSOffload\App' ) ) {
 		 * @param array $args array of class arguments (passed by the plugin utility class)
 		 */
 		protected function run() {
+			WP_Background_Process_Logging::init();
+
+			self::setup_background_sync();
+
 			Core::instance()->run();
 			Admin::instance()->run();
+		}
+
+		public static function setup_background_sync() {
+			self::$background_sync = new BackgroundSync();
+
+			add_filter( 'heartbeat_settings', function( $settings ) {
+				$settings['interval'] = 10;
+				return $settings;
+			});
+
+			if ( isset( $_GET['add_stuff'] ) ) {
+				for ( $i = 0; $i < 2000; $i++ ) {
+					self::$background_sync->push_to_queue( $i + 1 );
+				}
+				self::$background_sync->save();
+				add_action( 'admin_notices', function() {
+					echo 'added 2000 data stuff.';
+				});
+			}
+		}
+
+		public static function get_background_sync() {
+			return self::$background_sync;
 		}
 
 		/**

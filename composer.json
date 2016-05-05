@@ -29,20 +29,21 @@
     {
       "type": "package",
       "package": {
-        "name": "A5hleyRich/wp-background-processing",
+        "name": "felixarntz/wp-background-processing-ui",
         "version": "dev-master",
         "source": {
-          "url": "git://github.com/A5hleyRich/wp-background-processing.git",
+          "url": "git://github.com/felixarntz/wp-background-processing-ui.git",
           "type": "git",
           "reference": "master"
         },
         "dist": {
-          "url": "https://github.com/A5hleyRich/wp-background-processing/archive/master.zip",
+          "url": "https://github.com/felixarntz/wp-background-processing-ui/archive/master.zip",
           "type": "zip"
         },
         "autoload": {
           "classmap": [
-            "classes/"
+            "classes/",
+            "vendor/A5hleyRich/wp-background-processing/classes/"
           ]
         }
       }
@@ -60,7 +61,7 @@
     "composer/installers": "~1.0",
     "felixarntz/options-definitely": "0.6.2",
     "felixarntz/leavesandlove-wp-plugin-util": "2.0.1",
-    "A5hleyRich/wp-background-processing": "dev-master",
+    "felixarntz/wp-background-processing-ui": "dev-master",
     "google/apiclient": "^2.0.0@RC"
   },
   "require-dev": {

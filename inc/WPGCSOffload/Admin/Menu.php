@@ -72,5 +72,17 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Menu' ) ) {
 				),
 			), 'wp-gcs-offload' );
 		}
+
+		public function init_pages() {
+			add_action( 'load-' . str_replace( '.php', '_page', Admin::MENU_SLUG ) . '_' . Admin::SCREEN_SLUG, array( $this, 'init_manager_page' ) );
+		}
+
+		public function init_manager_page() {
+			if ( isset( $_GET['tab'] ) && Admin::SETTINGS_TAB_SLUG === $_GET['tab'] ) {
+				return;
+			}
+
+			$this->manager->init();
+		}
 	}
 }
