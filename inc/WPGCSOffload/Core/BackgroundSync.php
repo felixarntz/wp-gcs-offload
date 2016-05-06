@@ -39,5 +39,51 @@ if ( ! class_exists( 'WPGCSOffload\Core\BackgroundSync' ) ) {
 
 			return false;
 		}
+
+		public function get_attachment_ids( $mode = 'all', $number = -1, $offset = 0 ) {
+			$args = array(
+				'posts_per_page'			=> $number,
+				'offset'					=> $offset,
+				'no_found_rows'				=> true,
+				'suppress_filters'			=> true,
+				'update_post_term_cache'	=> false,
+				'orderby'					=> false,
+				'post_type'					=> 'attachment',
+				'fields'					=> 'ids',
+			);
+
+			$meta_keys = array();
+
+			switch ( $mode ) {
+				case 'remote':
+					$meta_keys['_wpgcso_bucket_name'] = 'EXISTS';
+					$meta_keys['_wpgcso_dir_name'] = 'EXISTS';
+					break;
+				case 'local':
+					$meta_keys['_wpgcso_remote_only'] = 'NOT EXISTS';
+					break;
+				case 'remote_only':
+					$meta_keys['_wpgcso_remote_only'] = 'EXISTS';
+					break;
+				case 'local_only':
+					$meta_keys['_wpgcso_bucket_name'] = 'NOT EXISTS';
+					$meta_keys['_wpgcso_dir_name'] = 'NOT EXISTS';
+					break;
+			}
+
+			if ( $meta_keys ) {
+				$args['meta_query'] = array(
+					'relation'	=> 'AND',
+				);
+				foreach ( $meta_keys as $key => $compare ) {
+					$args['meta_query'][] = array(
+						'key'		=> $key,
+						'compare'	=> $compare,
+					);
+				}
+			}
+
+			return get_posts( $args );
+		}
 	}
 }

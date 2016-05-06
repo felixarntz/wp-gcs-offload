@@ -24,8 +24,8 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Admin' ) ) {
 		const MANAGE_TAB_SLUG = 'wp-gcs-offload-manage';
 		const SETTINGS_TAB_SLUG = 'wp-gcs-offload-settings';
 
-		const CAP_MANAGE = 'manage_google_cloud_storage';
-		const CAP_SETUP = 'setup_google_cloud_storage';
+		const CAP_MANAGE = 'manage_cloud_storage';
+		const CAP_SETUP = 'setup_cloud_storage';
 
 		private static $instance = null;
 

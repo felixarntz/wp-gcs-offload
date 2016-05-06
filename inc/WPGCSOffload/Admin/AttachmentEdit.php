@@ -110,13 +110,9 @@ if ( ! class_exists( 'WPGCSOffload\Admin\AttachmentEdit' ) ) {
 				return new WP_Error( 'attachment_id_invalid', __( 'Invalid attachment ID.', 'wp-gcs-offload' ) );
 			}
 
-			$gcs_data = $attachment->upload_to_google_cloud_storage();
+			$gcs_data = $attachment->upload_to_cloud_storage();
 			if ( is_wp_error( $gcs_data ) ) {
 				return $gcs_data;
-			}
-
-			if ( Settings::instance()->get_setting( 'remote_only' ) ) {
-				$attachment->delete_local_file();
 			}
 
 			ob_start();

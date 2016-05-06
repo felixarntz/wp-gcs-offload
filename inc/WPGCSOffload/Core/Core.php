@@ -58,9 +58,25 @@ if ( ! class_exists( 'WPGCSOffload\Core\Core' ) ) {
 		}
 
 		public function setup_sync_assistant() {
+			if ( ! Client::instance()->is_configured() ) {
+				return;
+			}
+
 			$sync_assistant = SyncAssistant::instance();
 
-			add_filter( 'wp_update_attachment_metadata', array( $sync_assistant, 'wp_update_attachment_metadata' ), 10, 2 );
+			if ( Settings::instance()->get_setting( 'sync_addition' ) ) {
+				add_filter( 'wp_update_attachment_metadata', array( $sync_assistant, 'sync_addition' ), 10, 2 );
+			}
+			if ( Settings::instance()->get_setting( 'sync_deletion' ) ) {
+				add_action( 'delete_attachment', array( $sync_assistant, 'sync_deletion' ), 10, 1 );
+			}
+			if ( Settings::instance()->get_setting( 'remote_only' ) ) {
+				add_action( 'wpgcso_uploaded_to_cloud_storage', array( $sync_assistant, 'delete_local_on_upload' ), 10, 3 );
+			}
+
+			// the following hooks prevent accidental removing of files
+			add_action( 'wpgcso_delete_from_cloud_storage', array( $sync_assistant, 'store_local_on_remote_only_delete' ), 10, 3 );
+			add_action( 'wpgcso_delete_local_file', array( $sync_assistant, 'store_remote_on_local_only_delete' ), 10, 3 );
 		}
 
 		public function setup_ajax_handler() {

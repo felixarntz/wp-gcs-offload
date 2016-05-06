@@ -84,8 +84,8 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				return false;
 			}
 
-			$name = get_post_meta( $this->id, '_wpgcso_dir_name', true );
-			if ( ! $name ) {
+			$dir_name = get_post_meta( $this->id, '_wpgcso_dir_name', true );
+			if ( ! $dir_name ) {
 				return false;
 			}
 
@@ -94,7 +94,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				return false;
 			}
 
-			return 'https:' . Client::BASE_URL . $bucket_name . '/' . $name . '/' . $file;
+			return 'https:' . Client::BASE_URL . $bucket_name . '/' . $dir_name . '/' . $file;
 		}
 
 		public function get_cloud_storage_image_downsize( $size = 'thumbnail' ) {
@@ -132,7 +132,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			return array( $gcs_url, $width, $height, $is_intermediate );
 		}
 
-		public function upload_to_google_cloud_storage( $metadata = false ) {
+		public function upload_to_cloud_storage( $metadata = false, $suppress_hooks = false ) {
 			if ( ! Client::instance()->is_configured() ) {
 				return new WP_Error( 'client_not_configured', __( 'The Google Cloud Storage client is not configured properly.', 'wp-gcs-offload' ) );
 			}
@@ -140,9 +140,24 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			if ( ! $metadata ) {
 				$metadata = wp_get_attachment_metadata( $this->id );
 			}
+
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_upload_to_cloud_storage', $this->id, $this, $metadata );
+			}
+
+			//update_post_meta( $this->id, '_wpgcso_bucket_name', $bucket_name );
+			//update_post_meta( $this->id, '_wpgcso_dir_name', $dir_name );
+			/*foreach ( $image_sizes as $image_size ) {
+				add_post_meta( $this->id, '_wpgcso_image_sizes', $image_size );
+			}*/
+
+			// if success
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_uploaded_to_cloud_storage', $this->id, $this, $metadata );
+			}
 		}
 
-		public function delete_from_google_cloud_storage( $metadata = false ) {
+		public function delete_from_cloud_storage( $metadata = false, $suppress_hooks = false ) {
 			if ( ! Client::instance()->is_configured() ) {
 				return new WP_Error( 'client_not_configured', __( 'The Google Cloud Storage client is not configured properly.', 'wp-gcs-offload' ) );
 			}
@@ -150,9 +165,22 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			if ( ! $metadata ) {
 				$metadata = wp_get_attachment_metadata( $this->id );
 			}
+
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_delete_from_cloud_storage', $this->id, $this, $metadata );
+			}
+
+			//delete_post_meta( $this->id, '_wpgcso_bucket_name' );
+			//delete_post_meta( $this->id, '_wpgcso_dir_name' );
+			//delete_post_meta( $this->id, '_wpgcso_image_sizes' );
+
+			// if success
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_deleted_from_cloud_storage', $this->id, $this, $metadata );
+			}
 		}
 
-		public function get_from_google_cloud_storage( $metadata = false ) {
+		public function download_from_cloud_storage( $metadata = false, $suppress_hooks = false ) {
 			if ( ! Client::instance()->is_configured() ) {
 				return new WP_Error( 'client_not_configured', __( 'The Google Cloud Storage client is not configured properly.', 'wp-gcs-offload' ) );
 			}
@@ -160,11 +188,33 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 			if ( ! $metadata ) {
 				$metadata = wp_get_attachment_metadata( $this->id );
 			}
+
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_download_from_cloud_storage', $this->id, $this, $metadata );
+			}
+
+			//delete_post_meta( $this->id, '_wpgcso_remote_only' );
+
+			// if success
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_downloaded_from_cloud_storage', $this->id, $this, $metadata );
+			}
 		}
 
-		public function delete_local_file( $metadata = false ) {
+		public function delete_local_file( $metadata = false, $suppress_hooks = false ) {
 			if ( ! $metadata ) {
 				$metadata = wp_get_attachment_metadata( $this->id );
+			}
+
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_delete_local_file', $this->id, $this, $metadata );
+			}
+
+			//update_post_meta( $this->id, '_wpgcso_remote_only', true );
+
+			// if success
+			if ( ! $suppress_hooks ) {
+				do_action( 'wpgcso_deleted_local_file', $this->id, $this, $metadata );
 			}
 		}
 	}

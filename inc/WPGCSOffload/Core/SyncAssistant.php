@@ -34,30 +34,44 @@ if ( ! class_exists( 'WPGCSOffload\Core\SyncAssistant' ) ) {
 			// empty
 		}
 
-		public function wp_update_attachment_metadata( $data, $id ) {
-			if ( ! Client::instance()->is_configured() ) {
-				return $data;
-			}
-
-			if ( ! Settings::instance()->get_setting( 'sync_addition' ) ) {
-				return $data;
-			}
-
+		public function sync_addition( $data, $id ) {
 			$attachment = Attachment::get( $id );
 			if ( ! $attachment ) {
 				return $data;
 			}
 
-			$status = $attachment->upload_to_google_cloud_storage( $data );
-			if ( is_wp_error( $status ) ) {
-				return $data;
-			}
-
-			if ( Settings::instance()->get_setting( 'remote_only' ) ) {
-				$attachment->delete_local_file( $data );
-			}
+			$status = $attachment->upload_to_cloud_storage( $data );
 
 			return $data;
+		}
+
+		public function sync_deletion( $id ) {
+			$attachment = Attachment::get( $id );
+			if ( ! $attachment ) {
+				return;
+			}
+
+			$status = $attachment->delete_from_cloud_storage( false, true );
+		}
+
+		public function delete_local_on_upload( $id, $attachment, $metadata ) {
+			$status = $attachment->delete_local_file( $metadata, true );
+		}
+
+		public function store_local_on_remote_only_delete( $id, $attachment, $metadata ) {
+			if ( $attachment->is_local_file() ) {
+				return;
+			}
+
+			$status = $attachment->download_from_cloud_storage( $metadata );
+		}
+
+		public function store_remote_on_local_only_delete( $id, $attachment, $metadata ) {
+			if ( $attachment->is_cloud_storage_file() ) {
+				return;
+			}
+
+			$status = $attachment->upload_to_cloud_storage( $metadata );
 		}
 	}
 }
