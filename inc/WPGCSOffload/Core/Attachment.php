@@ -145,13 +145,81 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				do_action( 'wpgcso_upload_to_cloud_storage', $this->id, $this, $metadata );
 			}
 
-			//update_post_meta( $this->id, '_wpgcso_bucket_name', $bucket_name );
-			//update_post_meta( $this->id, '_wpgcso_dir_name', $dir_name );
-			/*foreach ( $image_sizes as $image_size ) {
-				add_post_meta( $this->id, '_wpgcso_image_sizes', $image_size );
-			}*/
+			$uploads = wp_get_upload_dir();
+			$main_file = get_post_meta( $this->id, '_wp_attached_file', true );
+			$mime_type = get_post_mime_type( $this->id );
 
-			// if success
+			if ( ! $this->is_cloud_storage_file() ) {
+				$image_sizes = array();
+				$dir_name = '';
+				$file = $main_file;
+				$path = $uploads['basedir'] . '/' . $file;
+				$args = array(
+					'attachment_id'	=> $this->id,
+				);
+				if ( wp_attachment_is_image( $this->id ) ) {
+					if ( isset( $metadata['width'] ) ) {
+						$args['width'] = $metadata['width'];
+					}
+					if ( isset( $metadata['height'] ) ) {
+						$args['height'] = $metadata['height'];
+					}
+					$args['size'] = 'full';
+				}
+
+				$status = Client::instance()->upload( $file, $path, $dir_name, $mime_type, $args );
+				if ( is_wp_error( $status ) ) {
+					return $status;
+				}
+
+				if ( wp_attachment_is_image( $this->id ) ) {
+					$image_sizes[] = 'full';
+				}
+
+				//TODO
+				//$bucket_name = $status['bucket_name']; // ???
+				//$dir_name = $status['dir_name']; // ???
+			} else {
+				$image_sizes = $this->get_cloud_storage_image_sizes();
+				$dir_name = $this->get_cloud_storage_dir_name();
+				$args = array(
+					'attachment_id'	=> $this->id,
+				);
+			}
+
+			if ( wp_attachment_is_image( $this->id ) && isset( $metadata['sizes'] ) && $metadata['sizes'] ) {
+				foreach ( $metadata['sizes'] as $size => $data ) {
+					if ( in_array( $size, $image_sizes, true ) ) {
+						continue;
+					}
+
+					$file = dirname( $main_file ) . '/' . $data['file'];
+					$path = $uploads['basedir'] . '/' . $file;
+					$args['width'] = $data['width'];
+					$args['height'] = $data['height'];
+					$args['size'] = $size;
+
+					$status = Client::instance()->upload( $file, $path, $dir_name, $mime_type, $args );
+					if ( is_wp_error( $status ) ) {
+						//TODO: handle this in a better way
+						continue;
+					}
+
+					$image_sizes[] = $size;
+				}
+			}
+
+			if ( isset( $bucket_name ) ) {
+				update_post_meta( $this->id, '_wpgcso_bucket_name', $bucket_name );
+				update_post_meta( $this->id, '_wpgcso_dir_name', $dir_name );
+			} else {
+				delete_post_meta( $this->id, '_wpgcso_image_sizes' );
+			}
+
+			foreach ( $image_sizes as $image_size ) {
+				add_post_meta( $this->id, '_wpgcso_image_sizes', $image_size );
+			}
+
 			if ( ! $suppress_hooks ) {
 				do_action( 'wpgcso_uploaded_to_cloud_storage', $this->id, $this, $metadata );
 			}
