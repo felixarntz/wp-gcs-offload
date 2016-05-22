@@ -59,7 +59,7 @@
   },
   "require": {
     "composer/installers": "~1.0",
-    "felixarntz/options-definitely": "0.6.2",
+    "felixarntz/options-definitely": "0.6.4",
     "felixarntz/leavesandlove-wp-plugin-util": "2.0.1",
     "felixarntz/wp-background-processing-ui": "dev-master",
     "google/apiclient": "^2.0.0@RC"
@@ -69,7 +69,7 @@
   },
   "extra": {
     "installer-paths": {
-      "vendor/felixarntz/{$name}/": ["felixarntz/options-definitely"]
+      "vendor/felixarntz/{$name}/": ["felixarntz/options-definitely", "felixarntz/wpdlib"]
     }
   }
 }
