@@ -97,7 +97,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Client' ) ) {
 				return $data; // file is already on Google Cloud Storage, so we return it
 			}
 
-			$file = $dir_name . '/' . $file;
+			$file = path_join( $dir_name, $file );
 
 			$obj = new Google_Service_Storage_StorageObject();
 			$obj->setName( $file );
@@ -171,7 +171,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Client' ) ) {
 				$dir_name = $this->get_dir_name();
 			}
 
-			$file = $dir_name . '/' . $file;
+			$file = path_join( $dir_name, $file );
 
 			try {
 				$data = $this->storage->objects->get( $this->bucket_name, $file );
@@ -195,7 +195,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Client' ) ) {
 				$dir_name = $this->get_dir_name();
 			}
 
-			$file = $dir_name . '/' . $file;
+			$file = path_join( $dir_name, $file );
 
 			try {
 				$this->storage->objects->delete( $this->bucket_name, $file );
