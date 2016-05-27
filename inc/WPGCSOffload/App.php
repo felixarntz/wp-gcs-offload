@@ -67,21 +67,6 @@ if ( ! class_exists( 'WPGCSOffload\App' ) ) {
 
 		public static function setup_background_sync() {
 			self::$background_sync = new BackgroundSync();
-
-			add_filter( 'heartbeat_settings', function( $settings ) {
-				$settings['interval'] = 10;
-				return $settings;
-			});
-
-			if ( isset( $_GET['add_stuff'] ) ) {
-				for ( $i = 0; $i < 2000; $i++ ) {
-					self::$background_sync->push_to_queue( $i + 1 );
-				}
-				self::$background_sync->save();
-				add_action( 'admin_notices', function() {
-					echo 'added 2000 data stuff.';
-				});
-			}
 		}
 
 		public static function get_background_sync() {

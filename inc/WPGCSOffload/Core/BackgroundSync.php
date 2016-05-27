@@ -24,18 +24,47 @@ if ( ! class_exists( 'WPGCSOffload\Core\BackgroundSync' ) ) {
 
 		protected $action = 'image_background_sync';
 
+		protected function before_start() {
+			$ids = $this->get_attachment_ids();
+			$this->data( $ids );
+			$this->increase_total( count( $ids ) );
+			$this->save();
+			return;
+
+			$this->push_to_queue( 'find_attachments' );
+			$this->save();
+		}
+
 		protected function task( $item ) {
-			$to = 'user' . $item . '@example.com';
-			$subject = 'Subject ' . $item;
-			$message = 'Hello, this is useless.';
+			/*if ( is_string( $item ) && 0 === strpos( $item, 'find_attachments' ) ) {
+				$number = 2;
+				$offset = 0;
+				if ( false !== strpos( $item, ':' ) ) {
+					$offset = absint( substr( $item, strlen( 'find_attachments:' ) ) );
+				}
 
-			$status = wp_mail( $to, $subject, $message );
+				$ids = $this->get_attachment_ids( 'all', $number, $offset );
 
-			if ( $status ) {
-				$this->log( sprintf( 'Successfully sent email with subject %1$s to %2$s.', $subject, $to ), 'success' );
-			} else {
-				$this->log( sprintf( 'Could not send email with subject %1$s to %2$s.', $subject, $to ), 'error' );
+				$this->log( sprintf( 'Found attachment ids %s.', implode( ', ', $ids ) ) );
+
+				$this->data( $ids );
+				$this->increase_total();
+				$this->save();
+
+				if ( count( $ids ) === $number ) {
+					return 'find_attachments:' . ( $offset + $number );
+				}
+
+				return false;
+			}*/
+
+			$id = absint( $item );
+			for ( $i = 0; $i < 50; $i++ ) {
+				wp_mail( 'hahahaa@example.com', 'some ID', $id );
 			}
+
+			$this->log( sprintf( 'Sent mail with %d twenty times.', $id ) );
+			$this->increase_progress();
 
 			return false;
 		}

@@ -42,12 +42,20 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Manager' ) ) {
 		}
 
 		public function enqueue_scripts() {
-			App::get_background_sync()->enqueue_script( '#wpgcso-progress', '#wpgcso-dispatch' );
+			$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+			wp_enqueue_style( 'wp-gcs-offload-manage-gcs', App::get_url( 'assets/manage-gcs' . $min . '.css' ), array(), App::get_info( 'version' ) );
+
+			App::get_background_sync()->enqueue_script( '#wpgcso-progress', '#wpgcso-start', '#wpgcso-empty-logs' );
 		}
 
 		public function render() {
 			?>
-			<button id="wpgcso-dispatch" class="button button-primary"><?php _e( 'Start Sync', 'wp-gcs-offload' ); ?></button>
+			<div class="wpgcso-sync-wrap">
+				<p class="highlight-text"><?php _e( 'Click on the sync button below to start transferring your existing attachments to Google Cloud Storage.', 'wp-gcs-offload' ); ?></p>
+				<p><button id="wpgcso-start" class="button button-primary button-hero"><?php _e( 'Start Sync', 'wp-gcs-offload' ); ?></button></p>
+				<p><a id="wpgcso-empty-logs" class="remove" href="#"><?php _e( 'Empty Logs', 'wp-gcs-offload' ); ?></a></p>
+			</div>
 			<div id="wpgcso-progress"></div>
 			<?php
 		}
