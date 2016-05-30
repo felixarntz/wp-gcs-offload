@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPGCSOffload\Core\Attachment class
+ *
  * @package WPGCSOffload
- * @version 0.5.0
+ * @subpackage Core
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPGCSOffload\Core;
@@ -186,7 +189,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 
 			$errors = false;
 			if ( isset( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-				list( $image_sizes, $errors ) = $this->upload_sizes_to_cloud_storage( $metadata['sizes'], $image_sizes, $main_file, $dir_name, $mime_type, $args );
+				$errors = $this->upload_sizes_to_cloud_storage( $metadata['sizes'], $image_sizes, $main_file, $dir_name, $mime_type, $args );
 			}
 
 			if ( isset( $bucket_name ) ) {
@@ -204,44 +207,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				do_action( 'wpgcso_uploaded_to_cloud_storage', $this->id, $this, $metadata );
 			}
 
-			// The errors in this object are not critical, so they do not make the overall process fail.
-			if ( is_wp_error( $errors ) ) {
-				return $errors;
-			}
-
-			return true;
-		}
-
-		private function upload_sizes_to_cloud_storage( $meta_sizes, $image_sizes, $main_file, $dir_name, $mime_type, $args ) {
-			$uploads = wp_get_upload_dir();
-
-			$errors = new WP_Error();
-
-			foreach ( $meta_sizes as $size => $data ) {
-				if ( in_array( $size, $image_sizes, true ) ) {
-					continue;
-				}
-
-				$file = str_replace( basename( $main_file ), $data['file'], $main_file );
-				$path = path_join( $uploads['basedir'], $file );
-				$args['width'] = $data['width'];
-				$args['height'] = $data['height'];
-				$args['size'] = $size;
-
-				$status = Client::instance()->upload( $file, $path, $dir_name, $mime_type, $args );
-				if ( is_wp_error( $status ) ) {
-					$errors->add( $status->get_error_code(), $status->get_error_message(), $status->get_error_data() );
-					continue;
-				}
-
-				$image_sizes[] = $size;
-			}
-
-			if ( empty( $errors->errors ) ) {
-				$errors = false;
-			}
-
-			return array( $image_sizes, $errors );
+			return $this->parse_return_value( $status, $errors );
 		}
 
 		public function download_from_cloud_storage( $metadata = false, $suppress_hooks = false ) {
@@ -273,24 +239,9 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				return $status;
 			}
 
-			// The errors in this object are not critical, so they will not make the overall process fail.
 			$errors = new WP_Error();
-
 			if ( isset( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-				foreach ( $metadata['sizes'] as $size => $data ) {
-					if ( ! in_array( $size, $image_sizes, true ) ) {
-						continue;
-					}
-
-					$file = str_replace( basename( $main_file ), $data['file'], $main_file );
-					$path = path_join( $uploads['basedir'], $file );
-
-					$status = Client::instance()->download( $file, $path, $dir_name );
-					if ( is_wp_error( $status ) ) {
-						$errors->add( $status->get_error_code(), $status->get_error_message(), $status->get_error_data() );
-						continue;
-					}
-				}
+				$errors = $this->download_sizes_from_google_cloud_storage( $metadata['sizes'], $image_sizes, $main_file, $dir_name );
 			}
 
 			delete_post_meta( $this->id, '_wpgcso_remote_only' );
@@ -299,11 +250,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				do_action( 'wpgcso_downloaded_from_cloud_storage', $this->id, $this, $metadata );
 			}
 
-			if ( ! empty( $errors->errors ) ) {
-				return $errors;
-			}
-
-			return true;
+			return $this->parse_return_value( $status, $errors );
 		}
 
 		public function delete_from_cloud_storage( $metadata = false, $suppress_hooks = false ) {
@@ -334,23 +281,9 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				return $status;
 			}
 
-			// The errors in this object are not critical, so they will not make the overall process fail.
-			$errors = new WP_Error();
-
+			$errors = false;
 			if ( isset( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-				foreach ( $metadata['sizes'] as $size => $data ) {
-					if ( ! in_array( $size, $image_sizes, true ) ) {
-						continue;
-					}
-
-					$file = str_replace( basename( $main_file ), $data['file'], $main_file );
-
-					$status = Client::instance()->delete( $file, $dir_name );
-					if ( is_wp_error( $status ) ) {
-						$errors->add( $status->get_error_code(), $status->get_error_message(), $status->get_error_data() );
-						continue;
-					}
-				}
+				$errors = $this->delete_sizes_from_google_cloud_storage( $metadata['sizes'], $image_sizes, $main_file, $dir_name );
 			}
 
 			delete_post_meta( $this->id, '_wpgcso_bucket_name' );
@@ -361,11 +294,7 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				do_action( 'wpgcso_deleted_from_cloud_storage', $this->id, $this, $metadata );
 			}
 
-			if ( ! empty( $errors->errors ) ) {
-				return $errors;
-			}
-
-			return true;
+			return $this->parse_return_value( $status, $errors );
 		}
 
 		public function delete_local_file( $metadata = false, $suppress_hooks = false ) {
@@ -393,23 +322,9 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				}
 			}
 
-			// The errors in this object are not critical, so they will not make the overall process fail.
-			$errors = new WP_Error();
-
+			$errors = false;
 			if ( isset( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-				foreach ( $metadata['sizes'] as $size => $data ) {
-					if ( ! in_array( $size, $image_sizes, true ) ) {
-						continue;
-					}
-
-					$file = str_replace( basename( $main_file ), $data['file'], $main_file );
-					$path = path_join( $uploads['basedir'], $file );
-
-					if ( ! @unlink( $path ) ) {
-						$errors->add( 'cannot_delete_file', sprintf( __( 'The file of size %s for attachment %d could not be deleted.', 'wp-gcs-offload' ), $size, $this->id ) );
-						continue;
-					}
-				}
+				$errors = $this->delete_local_sizes( $metadata['sizes'], $image_sizes, $main_file, $dir_name );
 			}
 
 			update_post_meta( $this->id, '_wpgcso_remote_only', true );
@@ -418,11 +333,131 @@ if ( ! class_exists( 'WPGCSOffload\Core\Attachment' ) ) {
 				do_action( 'wpgcso_deleted_local_file', $this->id, $this, $metadata );
 			}
 
-			if ( ! empty( $errors->errors ) ) {
-				return $errors;
+			return $this->parse_return_value( array(), $errors );
+		}
+
+		private function parse_return_value( $data, $errors ) {
+			$ret = array(
+				'data'		=> $data,
+				'errors'	=> array(),
+			);
+
+			// The errors in this object are not critical, so they do not make the overall process fail.
+			if ( is_wp_error( $errors ) ) {
+				//TODO
+				$ret['errors'] = $this->parse_errors( $errors );
 			}
 
-			return true;
+			return $ret;
+		}
+
+		private function upload_sizes_to_cloud_storage( $meta_sizes, &$image_sizes, $main_file, $dir_name, $mime_type, $args ) {
+			$uploads = wp_get_upload_dir();
+
+			$errors = new WP_Error();
+
+			foreach ( $meta_sizes as $size => $data ) {
+				if ( in_array( $size, $image_sizes, true ) ) {
+					continue;
+				}
+
+				$file = str_replace( basename( $main_file ), $data['file'], $main_file );
+				$path = path_join( $uploads['basedir'], $file );
+				$args['width'] = $data['width'];
+				$args['height'] = $data['height'];
+				$args['size'] = $size;
+
+				$status = Client::instance()->upload( $file, $path, $dir_name, $mime_type, $args );
+				if ( is_wp_error( $status ) ) {
+					$errors->add( $status->get_error_code(), $status->get_error_message(), $status->get_error_data() );
+					continue;
+				}
+
+				$image_sizes[] = $size;
+			}
+
+			if ( empty( $errors->errors ) ) {
+				return true;
+			}
+
+			return $errors;
+		}
+
+		private function download_sizes_from_google_cloud_storage( $meta_sizes, $image_sizes, $main_file, $dir_name ) {
+			$uploads = wp_get_upload_dir();
+
+			$errors = new WP_Error();
+
+			foreach ( $meta_sizes as $size => $data ) {
+				if ( ! in_array( $size, $image_sizes, true ) ) {
+					continue;
+				}
+
+				$file = str_replace( basename( $main_file ), $data['file'], $main_file );
+				$path = path_join( $uploads['basedir'], $file );
+
+				$status = Client::instance()->download( $file, $path, $dir_name );
+				if ( is_wp_error( $status ) ) {
+					$errors->add( $status->get_error_code(), $status->get_error_message(), $status->get_error_data() );
+					continue;
+				}
+			}
+
+			if ( empty( $errors->errors ) ) {
+				return true;
+			}
+
+			return $errors;
+		}
+
+		private function delete_sizes_from_google_cloud_storage( $meta_sizes, $image_sizes, $main_file, $dir_name ) {
+			$errors = new WP_Error();
+
+			foreach ( $meta_sizes as $size => $data ) {
+				if ( ! in_array( $size, $image_sizes, true ) ) {
+					continue;
+				}
+
+				$file = str_replace( basename( $main_file ), $data['file'], $main_file );
+
+				$status = Client::instance()->delete( $file, $dir_name );
+				if ( is_wp_error( $status ) ) {
+					$errors->add( $status->get_error_code(), $status->get_error_message(), $status->get_error_data() );
+					continue;
+				}
+			}
+
+			if ( empty( $errors->errors ) ) {
+				return true;
+			}
+
+			return $errors;
+		}
+
+		private function delete_local_sizes( $meta_sizes, $image_sizes, $main_file, $dir_name ) {
+			$uploads = wp_get_upload_dir();
+
+			$errors = new WP_Error();
+
+			foreach ( $meta_sizes as $size => $data ) {
+				if ( ! in_array( $size, $image_sizes, true ) ) {
+					continue;
+				}
+
+				$file = str_replace( basename( $main_file ), $data['file'], $main_file );
+				$path = path_join( $uploads['basedir'], $file );
+
+				if ( ! @unlink( $path ) ) {
+					$errors->add( 'cannot_delete_file', sprintf( __( 'The file of size %s for attachment %d could not be deleted.', 'wp-gcs-offload' ), $size, $this->id ) );
+					continue;
+				}
+			}
+
+			if ( empty( $errors->errors ) ) {
+				return true;
+			}
+
+			return $errors;
 		}
 	}
 }

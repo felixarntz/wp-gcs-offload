@@ -5,19 +5,22 @@
   "license": "GPL-3.0",
   "type": "wordpress-plugin",
   "keywords": [
-    "wordpress",
-    "plugin",
+    "media management",
     "google cloud storage",
     "offload",
     "media library",
-    "cdn"
+    "attachment",
+    "cdn",
+    "sync",
+    "stateless",
+    "background processing"
   ],
   "homepage": "https://wordpress.org/plugins/wp-gcs-offload/",
   "authors": [
     {
       "name": "Felix Arntz",
       "email": "felix-arntz@leaves-and-love.net",
-      "homepage": "http://leaves-and-love.net",
+      "homepage": "https://leaves-and-love.net",
       "role": "Developer"
     }
   ],

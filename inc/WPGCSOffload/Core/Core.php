@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPGCSOffload\Core\Core class
+ *
  * @package WPGCSOffload
- * @version 0.5.0
+ * @subpackage Core
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPGCSOffload\Core;

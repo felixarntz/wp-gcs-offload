@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPGCSOffload\Admin\Manager class
+ *
  * @package WPGCSOffload
- * @version 0.5.0
+ * @subpackage Admin
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPGCSOffload\Admin;
@@ -44,7 +47,7 @@ if ( ! class_exists( 'WPGCSOffload\Admin\Manager' ) ) {
 		public function enqueue_scripts() {
 			$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-			wp_enqueue_style( 'wp-gcs-offload-manage-gcs', App::get_url( 'assets/manage-gcs' . $min . '.css' ), array(), App::get_info( 'version' ) );
+			wp_enqueue_style( 'wp-gcs-offload-manage-gcs', App::get_url( 'assets/dist/css/manage-gcs' . $min . '.css' ), array(), App::get_info( 'version' ) );
 
 			App::get_background_sync()->enqueue_script( '#wpgcso-progress', '#wpgcso-start', '#wpgcso-empty-logs' );
 		}

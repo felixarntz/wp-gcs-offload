@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPGCSOffload\Admin\Admin class
+ *
  * @package WPGCSOffload
- * @version 0.5.0
+ * @subpackage Admin
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPGCSOffload\Admin;
