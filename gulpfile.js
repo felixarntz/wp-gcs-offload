@@ -2,6 +2,23 @@
 
 var pkg = require( './package.json' );
 
+function parseKeywords( keywords ) {
+	// These keywords are useful for Packagist/NPM/Bower, but not for the WordPress plugin repository.
+	var disallowed = [ 'wordpress', 'plugin' ];
+
+	k = keywords;
+	for ( var i in disallowed ) {
+		var index = k.indexOf( disallowed[ i ] );
+		if ( -1 < index ) {
+			k.splice( index, 1 );
+		}
+	}
+
+	return k;
+}
+
+var keywords = parseKeywords( pkg.keywords );
+
 var config = {
 	pluginSlug: pkg.name,
 	pluginName: 'WP GCS Offload',
@@ -13,7 +30,7 @@ var config = {
 	version: pkg.version,
 	license: pkg.license.name,
 	licenseURI: pkg.license.url,
-	tags: pkg.keywords.join( ', ' ),
+	tags: keywords.join( ', ' ),
 	contributors: [ 'flixos90' ].join( ', ' ),
 	minRequired: '4.0',
 	testedUpTo: '4.5.2',

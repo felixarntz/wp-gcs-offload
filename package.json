@@ -3,6 +3,8 @@
   "version": "0.5.0",
   "description": "This plugin allows offloading your media library to Google Cloud Storage, including easy management and migration tools.",
   "keywords": [
+    "wordpress",
+    "plugin",
     "media management",
     "google cloud storage",
     "offload",
